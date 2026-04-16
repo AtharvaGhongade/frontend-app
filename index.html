@@ -1,17 +1,46 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>Azure 3-Tier App</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      margin-top: 60px;
+      background: #f4f8ff;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    pre {
+      width: 70%;
+      margin: 20px auto;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
 <body>
-  <h1>Azure 3-Tier App</h1>
-  <button onclick="loadData()">Fetch Data</button>
-  <pre id="out"></pre>
+
+  <h1>Azure 3-Tier Application</h1>
+  <p>Frontend + Backend + SQL Database</p>
+
+  <button onclick="loadData()">Fetch Backend Data</button>
+
+  <pre id="output">Click the button...</pre>
 
   <script>
     async function loadData() {
       const res = await fetch("https://backend-123.azurewebsites.net/api");
       const data = await res.json();
-      document.getElementById("out").innerText =
+      document.getElementById("output").textContent =
         JSON.stringify(data, null, 2);
     }
   </script>
+
 </body>
 </html>
