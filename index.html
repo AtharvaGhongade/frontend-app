@@ -33,14 +33,19 @@
 
   <pre id="output">Click the button...</pre>
 
-  <script>
-    async function loadData() {
-      const res = await fetch("https://backend-123.azurewebsites.net/api");
-      const data = await res.json();
-      document.getElementById("output").textContent =
-        JSON.stringify(data, null, 2);
-    }
-  </script>
+<script>
+async function loadData() {
+  const res = await fetch("https://backend-123.azurewebsites.net/api");
+  const data = await res.json();
+
+  const utcTime = data.data[0].currentTime;
+  const localTime = new Date(utcTime).toLocaleString("en-IN");
+
+  document.getElementById("output").textContent =
+    "Message: " + data.message + "\n\n" +
+    "Current Time (IST): " + localTime;
+}
+</script>
 
 </body>
 </html>
