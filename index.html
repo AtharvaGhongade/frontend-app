@@ -1,51 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Azure 3-Tier App</title>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: Arial;
-      text-align: center;
-      margin-top: 60px;
-      background: #f4f8ff;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    pre {
-      width: 70%;
-      margin: 20px auto;
+    .container {
       background: white;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: left;
+      border-radius: 12px;
+      padding: 40px;
+      width: 500px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
+    h1 { color: #0078D4; margin-bottom: 8px; font-size: 22px; }
+    p.subtitle { color: #666; margin-bottom: 30px; font-size: 14px; }
+    button {
+      background: #0078D4;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover { background: #005a9e; }
+    button.secondary { background: #107C10; }
+    button.secondary:hover { background: #0a5c0a; }
+    .result {
+      margin-top: 20px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 16px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 13px;
+      min-height: 80px;
+      white-space: pre-wrap;
+    }
+    .status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 16px;
+    }
+    .status.ok { background: #e6f4ea; color: #107C10; }
+    .status.error { background: #fde7e9; color: #D83B01; }
+    .status.loading { background: #e8f4fd; color: #0078D4; }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>Azure 3-Tier Architecture</h1>
+    <p class="subtitle">Frontend: Static Web App → Backend: App Service → Database: MySQL</p>
 
-  <h1>Azure 3-Tier Application</h1>
-  <p>Frontend + Backend + SQL Database</p>
+    <div id="statusBadge" class="status loading">Checking...</div>
 
-  <button onclick="loadData()">Fetch Backend Data</button>
+    <br>
+    <button onclick="checkHealth()">Health Check</button>
+    <button class="secondary" onclick="fetchData()">Fetch DB Data</button>
 
-  <pre id="output">Click the button...</pre>
+    <div class="result" id="output">Results will appear here...</div>
+  </div>
 
-<script>
-async function loadData() {
-  const res = await fetch("https://backend-123.azurewebsites.net/api");
-  const data = await res.json();
+  <script>
+    const BACKEND = 'https://3tier-backend-byc4dnang2b6bdhm.centralindia-01.azurewebsites.net';
 
-  const utcTime = data.data[0].currentTime;
-  const localTime = new Date(utcTime).toLocaleString("en-IN");
+    async function checkHealth() {
+      const badge = document.getElementById('statusBadge');
+      const output = document.getElementById('output');
+      badge.className = 'status loading';
+      badge.textContent = 'Checking...';
+      output.textContent = 'Calling /health endpoint...';
+      try {
+        const res = await fetch(`${BACKEND}/health`);
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+        badge.className = 'status ok';
+        badge.textContent = 'Backend Online';
+      } catch (err) {
+        output.textContent = 'Error: ' + err.message;
+        badge.className = 'status error';
+        badge.textContent = 'Backend Offline';
+      }
+    }
 
-  document.getElementById("output").textContent =
-    "Message: " + data.message + "\n\n" +
-    "Current Time (IST): " + localTime;
-}
-</script>
+    async function fetchData() {
+      const output = document.getElementById('output');
+      output.textContent = 'Fetching data from MySQL via backend...';
+      try {
+        const res = await fetch(`${BACKEND}/api/data`);
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        output.textContent = 'Error: ' + err.message;
+      }
+    }
 
+    // Auto health check on load
+    checkHealth();
+  </script>
 </body>
 </html>
