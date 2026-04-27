@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        VM = '20.219.201.21'
+        VM = '20.235.198.130'
     }
 
     stages {
@@ -16,8 +16,8 @@ pipeline {
         stage('Deploy to VM') {
             steps {
                 sshagent(['azure-vm-ssh']) {
-                    sh "ssh -o StrictHostKeyChecking=no azureuser@${VM} 'cd /opt/app && git pull && sudo systemctl restart myapp'"
-                }
+sh "ssh -o StrictHostKeyChecking=no azureuser@${VM} 'cd /opt/app && git pull'"
+}
             }
         }
 
