@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    environment {
+        ACR = 'yourregistry.azurecr.io'
+        IMAGE = 'frontend-app'
+        TAG = "${BUILD_NUMBER}"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh "docker build -t ${ACR}/${IMAGE}:${TAG} ."
+            }
+        }
+
+        stage('Push to ACR') {
+            steps {
+                sh "az acr login --name yourregistry"
+                sh "docker push ${ACR}/${IMAGE}:${TAG}"
+            }
+        }
+
+        stage('Deploy to App Service') {
+            steps {
+                sh "az webapp config container set --name your-app --resource-group your-rg --docker-custom-image-name ${ACR}/${IMAGE}:${TAG}"
+            }
+        }
+
+    }
+
+    post {
+        success { echo "Container deployed to App Service" }
+        failure { echo "Deployment failed" }
+        always  { sh "docker rmi ${ACR}/${IMAGE}:${TAG} || true" }
+    }
+}
