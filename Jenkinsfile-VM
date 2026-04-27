@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+
+    environment {
+        VM = '20.219.201.21'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Deploy to VM') {
+            steps {
+                sshagent(['azure-vm-ssh']) {
+                    sh "ssh -o StrictHostKeyChecking=no azureuser@${VM} 'cd /opt/app && git pull && sudo systemctl restart myapp'"
+                }
+            }
+        }
+
+    }
+
+    post {
+        success { echo "Code deployed to VM" }
+        failure { echo "VM deployment failed" }
+    }
+}
