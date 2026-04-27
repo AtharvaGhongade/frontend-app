@@ -16,7 +16,7 @@ pipeline {
         stage('Deploy to VM') {
             steps {
                 sshagent(['azure-vm-ssh']) {
-sh "ssh -o StrictHostKeyChecking=no azureuser@${VM} 'cd /opt/app && git pull'"
+            sh "ssh -o StrictHostKeyChecking=no azureuser@${VM} 'cd /opt/app && git pull && sudo cp /opt/app/index.html /var/www/html/index.html'"
 }
             }
         }
